@@ -5,5 +5,5 @@ RUN wget https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css
 
 
 WORKDIR /
-ENTRYPOINT ["gunicorn", "--access-logfile", "'-'", "-b", "0.0.0.0:80", "main:app"]
+ENTRYPOINT ["gunicorn", "main:app"]
 COPY main.py /

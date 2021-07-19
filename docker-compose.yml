@@ -2,7 +2,7 @@ version: "3.9"
 services:
   web:
     build: .
-    envfile: ./ENV.env
+    env_file: ./ENV.env
     restart: unless-stopped
     volumes:
      - "./CONFIG.yml:/config.yaml:ro"
