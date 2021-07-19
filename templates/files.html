@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="{{url_for('stylesheet')}}" rel="stylesheet">
+
+    <title>Listing for {{path}}</title>
+  </head>
+  <body>
+    <nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        {% for item in path_broken %}
+        {% if loop.last %}
+            <li class="breadcrumb-item"><a href="{{ url_for('main', path='/'.join(path_broken[:loop.index])) }}">{{item}}</a></li>
+        {% else %}
+            <li class="breadcrumb-item active" aria-current="page">{{item}}</li>
+        {% endif %}
+        {% endfor %}
+      </ol>
+    </nav>
+
+    <main class="container">
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger" role="alert">
+     {{ message | safe }}
+    </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Size</th>
+                {% if can_del %}<th scope="col">Delete?</th>{% endif %}
+            </tr>
+        <thead>
+        <tbody>
+            {% for file in os.listdir(truepath) %}
+                <tr>
+                    <td><a href="{{ url_for('main', path=os.path.join(path, file)) }}">{{file}}{% if os.path.isdir(os.path.join(truepath, file)) %}/{%endif%}</a></td>
+                    <td>{% if os.path.isdir(os.path.join(truepath, file)) %}{{"<DIR>"}}{% else %}{{os.path.getsize(os.path.join(truepath, file))}} ({{os.path.getsize(os.path.join(truepath, file)) | filesizeformat}}){%endif%}</td>
+                    {% if can_del %}<td>
+                        <form method="POST">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="path" value="{{os.path.join(path, file)}}">
+                            <input type="submit" value="X" class="btn btn-outline-danger">
+                        </form>
+                     </td>{% endif %}
+                </tr>
+            {% endfor %}                    
+    </table>
+    {% if can_add %}
+    <form method="POST">
+      <div class="input-group mb-3">
+        <span id="create-dir-text" class="input-group-text">Create a directory with name</span>
+        <input type="hidden" name="action" value="mkdir">
+        <input type="text" name="dirname" class="form-control" placeholder="New directory" aria-label="Enter the new directory's name here" aria-describedby="create-dir-text">
+        <input type="submit" value="Create!" class="btn form-control btn-outline-success">
+      </div>
+    </form>
+    
+    <form method="POST" enctype="multipart/form-data">
+      <div class="input-group mb-3">
+        <span id="create-dir-text" class="input-group-text">Upload a file</span>
+        <input type="hidden" name="action" value="upload">
+        <input name="file" type="file" class="form-control">
+        <input type="submit" value="Upload!" class="btn form-control btn-outline-success">
+      </div>
+    </form>
+    {% endif %}
+
+    </main>
+  </body>
+</html>
