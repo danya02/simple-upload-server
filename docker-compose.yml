@@ -2,8 +2,19 @@ version: "3.9"
 services:
   web:
     build: .
+    envfile: ./ENV.env
     restart: unless-stopped
     volumes:
      - "./CONFIG.yml:/config.yaml:ro"
      - "~/web:/data"
+    ports:
+     - target: 80
+       published: 8000
+       protocol: tcp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 20s
 
